@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <span id="alert_action"></span>
+        <div class="row">
+            <div class="col-lg-12">
+                <br>
+                <div class="card card-default" style="width: 120%">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-lg-10 col-md-10 col-sm-8 col-xs-6">
+                                <h3 class="card-title">Brand List</h3>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6" align="right">
+                                <button type="button" name="add" id="add_button" data-toggle="modal"
+                                        data-target="#brandModal" class="btn btn-success btn-xs">Add
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="clear:both"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-12 table-responsive">
+                                <table id="user_data" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Brand Name</th>
+                                            <th>Category</th>
+                                            <th>Status</th>
+                                            <th>Edit</th>
+                                            <th>Delete</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for brand in brands %}
+                                            <tr>
+                                                <td>{{ brand.brand_id }}</td>
+                                                <td>{{ brand.brand_name }}</td>
+                                                <td>{{ brand.category.category_name }}</td>
+                                                <td>
+                                                    {% if brand.brand_status == 'active' %}
+                                                        <span class="badge badge-success">Active</span>
+                                                    {% else %}
+                                                        <span class="badge badge-danger">Inactive</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <a href="/brand/status_change/{{ brand.brand_id }}/">
+                                                        <button type="button" name="delete" id=""
+                                                                class="btn btn-error btn-xs">Change
+                                                        </button>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <button type="button" name="update" id=""
+                                                            class="btn btn-warning btn-xs" data-toggle="modal"
+                                                            data-target="#{{ brand.brand_id }}">Update
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination" style="justify-content: center;">
+                                {% if brands.has_previous %}
+                                    <li class="page-item"><a class="page-link"
+                                                             href="?page={{ brands.previous_page_number }}">Previous</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled"><a class="page-link"
+                                                                      href="">Previous</a></li>
+                                {% endif %}
+                                {% for i in brands.paginator.page_range %}
+                                    {% if brands.number == i %}
+                                        <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                                    {% else %}
+                                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if brands.has_next %}
+                                    <li class="page-item"><a class="page-link"
+                                                             href="?page={{ brands.next_page_number }}">Next</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled"><a class="page-link"
+                                                                      href="">Next</a></li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {% for brand in brands %}
+        <div id="{{ brand.brand_id }}" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <form method="post" id="user_form">
+                    {% csrf_token %}
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title"><i class="fa fa-plus"></i> Edit Brand</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Enter User Name</label>
+                                <input type="text" name="category_name" id="category_name" class="form-control" required
+                                       value="{{ brand.brand_name }}"/>
+                            </div>
+                            <div class="form-group">
+                                <label>Category</label>
+                                 <select name="category_id" class="form-control" required>
+                                    {% for category in categories %}
+                                        <option value="{{ category.category_id }}">{{ category.category_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="hidden" name="user_id" id="user_id"/>
+                            <input type="hidden" name="btn_action" id="btn_action"/>
+                            <input type="submit" name="action" id="action" class="btn btn-info" value="Update"/>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div id="brandModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <form method="post" id="user_form" action="/brand/add/">
+                {% csrf_token %}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title"><i class="fa fa-plus"></i> Add Brand</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Enter Brand Name</label>
+                            <input type="text" name="brand_name" id="brand_name" class="form-control" required/>
+                        </div>
+                        <div class="form-group">
+                                <label>Brand Category</label>
+                                <select name="category_id" class="form-control" required>
+                                    {% for category in categories %}
+                                        <option value="{{ category.category_id }}">{{ category.category_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="submit" name="action" id="action" class="btn btn-info" value="Add"/>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

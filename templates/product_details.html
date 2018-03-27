@@ -1,0 +1,19 @@
+<div class="row">
+    <div class="col-sm-7">
+        <select name="product_id" id="product_id" class="form-control selectpicker"
+                required>
+            {% for product in products %}
+                <option value="{{ product.0 }}">{{ product.1 }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-sm-3">
+        <input type="number" class="form-control" required value="1">
+    </div>
+    <div class="col-sm-1">
+        <button type="button" name="add_more" id="add_more"
+                class="btn btn-success btn-xs" onclick="addProductRow()">+
+        </button>
+    </div>
+</div>
+<br>

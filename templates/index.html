@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+{% block content %}
+
+    <br>
+    <div class="container">
+        <div class="row">
+            {% if request.session.user_type == 'master' %}
+                <div class="col-md-3">
+                    <div class="card card-default">
+                        <div class="card-header bg-primary text-white"><strong>Total User / Online</strong></div>
+                        <div class="card-body" align="center">
+                            <h1>{{ users_count.0 }} / {{ users_online }}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-default">
+                        <div class="card-header bg-primary text-white"><strong>Total Category</strong></div>
+                        <div class="card-body" align="center">
+                            <h1>{{ category_count.0 }}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-default">
+                        <div class="card-header bg-primary text-white"><strong>Total Brand</strong></div>
+                        <div class="card-body" align="center">
+                            <h1>{{ brand_count.0 }}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-default">
+                        <div class="card-header bg-primary text-white"><strong>Total Item in Stock</strong></div>
+                        <div class="card-body" align="center">
+                            <h1>{{ product_count.0 }}</h1>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="col-md-4">
+                <br>
+                <div class="card card-default">
+                    <div class="card-header bg-primary text-white"><strong>Total Order Value</strong></div>
+                    <div class="card-body" align="center">
+                        <h1>{{ total_order_value.0|intcomma }} TK</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <br>
+                <div class="card card-default">
+                    <div class="card-header bg-primary text-white bg-primary text-white"><strong>Total Cash Order
+                                                                                                 Value</strong></div>
+                    <div class="card-body" align="center">
+                        <h1>{{ total_cash_value.0|intcomma }} TK</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <br>
+                <div class="card card-default">
+                    <div class="card-header bg-primary text-white"><strong>Total Credit Order Value</strong></div>
+                    <div class="card-body" align="center">
+                        <h1>{{ total_credit_value.0|intcomma }} TK</h1>
+                    </div>
+                </div>
+            </div>
+            <hr/>
+            {% if request.session.user_type == 'master' %}
+                <div class="col-md-12">
+                <br>
+                <div class="card card-default">
+                    <div class="card-header bg-primary text-white"><strong>Total Order Value User wise</strong></div>
+                    <div class="card-body" align="center">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Sl.</th>
+                                        <th>User Name</th>
+                                        <th>Total Order Value</th>
+                                        <th>Total Cash Order</th>
+                                        <th>Total Credit Order</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for users_datum in users_data %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ users_datum.3|intcomma }}</td>
+                                            <td>{{ users_datum.0|intcomma }} Tk</td>
+                                            <td>{{ users_datum.1|intcomma }} Tk</td>
+                                            <td>{{ users_datum.2|intcomma }} Tk</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination" style="justify-content: center;">
+                                {% if users_data.has_previous %}
+                                    <li class="page-item"><a class="page-link"
+                                                             href="?page={{ users_data.previous_page_number }}">Previous</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled"><a class="page-link"
+                                                                      href="">Previous</a></li>
+                                {% endif %}
+                                {% for i in users_data.paginator.page_range %}
+                                    {% if users_data.number == i %}
+                                        <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                                    {% else %}
+                                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if users_data.has_next %}
+                                    <li class="page-item"><a class="page-link"
+                                                             href="?page={{ users_data.next_page_number }}">Next</a></li>
+                                {% else %}
+                                    <li class="page-item disabled"><a class="page-link"
+                                                                      href="">Next</a></li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            </div>
+        </div>
+{% endblock %}

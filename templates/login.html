@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <br>
+    {% if not request.session.user_name %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-4">
+            </div>
+            <div class="col-sm-4">
+                <h2 align="center">Inventory Management System Login</h2>
+                <br>
+                <div class="card">
+                    <div class="card-header success" align="center">
+                        Login
+                    </div>
+                    <div class="card-body">
+                        <form action="/login/" method="post" class="form">
+                            {% for message in messages %}
+                                <p class="text-danger" style="display: inline;">{{ message }}</p>
+                            {% endfor %}
+                            {% csrf_token %}
+                            <div class="form-group">
+                                Username <input type="text" name="username" class="form-control" autocomplete="off"
+                                                required>
+                                Password <input type="password" name="password" class="form-control" autocomplete="off"
+                                                required>
+                            </div>
+                            <input type="submit" value="Login" class="btn btn-primary">
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4"></div>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block script %}
+    <script>
+
+    </script>
+{% endblock %}

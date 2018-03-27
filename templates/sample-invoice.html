@@ -1,0 +1,220 @@
+{% load mathfilters %}
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Invoice #AA59X-{{ order.0 }}</title>
+        <link rel="stylesheet" href="/static/css/bootstrap2.css">
+        <style>
+            /* latin-ext */
+            @font-face {
+                font-family: 'Bree Serif';
+                font-style: normal;
+                font-weight: 400;
+                src: local('Bree Serif Regular'), local('BreeSerif-Regular'), url("/static/fonts/BreeSerif-Regular.ttf") format('truetype');
+                unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+            }
+
+            /* latin */
+            @font-face {
+                font-family: 'Bree Serif';
+                font-style: normal;
+                font-weight: 400;
+                src: local('Bree Serif Regular'), local('BreeSerif-Regular'), url("/static/fonts/BreeSerif-Regular.ttf") format('truetype');
+                unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+            }
+
+            body, h1, h2, h3, h4, h5, h6 {
+                font-family: 'Bree Serif', serif;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="pdf-content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <h1>
+                            Syslok Digital
+                        </h1>
+                        <p>Date: {{ order.9 }}
+                        <p>Status:
+                            {% if order.7 == 'active' %}
+                                <span class="badge badge-danger">Pending</span>
+                            {% else %}
+                                <span class="badge badge-success">Completed</span>
+                            {% endif %}
+
+                    </div>
+                    <div class="col-xs-6 text-right">
+                        <h1>INVOICE</h1>
+                        <h1>
+                            <small>ID #AA59X-{{ order.0 }}</small>
+                        </h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-5">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4>From: {{ request.session.user_name }}</h4>
+                            </div>
+                            <div class="panel-body">
+                                <p>
+                                    Address <br>
+                                    details <br>
+                                    more <br>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-5 col-xs-offset-2 text-right">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4>To : {{ order.4 }}</h4>
+                            </div>
+                            <div class="panel-body">
+                                <p>
+                                    Address: <br>
+                                    {{ order.5 }}
+
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- / end client details section -->
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th width="1%">
+                                <h4>Sl.</h4>
+                            </th>
+                            <th>
+                                <h4>Product Name</h4>
+                            </th>
+                            <th width="1%">
+                                <h4>Quantity</h4>
+                            </th>
+                            <th>
+                                <h4>Rate/Price</h4>
+                            </th>
+                            <th>
+                                <h4>Tax(%)</h4>
+                            </th>
+                            <th>
+                                <h4>Sub Total</h4>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ item.9 }}</td>
+                                <td class="text-right">{{ item.3 }}</td>
+                                <td class="text-right">{{ item.13 }} TK</td>
+                                <td class="text-right">{{ item.14 }}%</td>
+
+                                {% with calc1=item.13|mul:item.3 calc2=item.14|div:100 %}
+                                    <td class="text-right">{{ calc1|mul:calc2|addition:calc1 }} TK</td>
+                                {% endwith %}
+
+                                {#                                <td class="text-right">{{ item.14|div:100|mul:item.13|addition:item.13|mul:item.3 }} TK</td>#}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="row text-right">
+                    <div class="col-xs-2 col-xs-offset-8">
+                        <p>
+                            <strong>
+                                Sub Total : <br>
+                                Discount : <br>
+                                Total : <br>
+                            </strong>
+                        </p>
+                    </div>
+                    <div class="col-xs-2">
+                        <p>
+                            {{ order.2 }} TK <br>
+                            {{ order.9 }}% <br>
+                            {{ order.9|div:100|mul:order.2|sub:order.2|abs }} TK <br>
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-5">
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <h4>Bank details</h4>
+                            </div>
+                            <div class="panel-body">
+                                <p>Your Name : </p>
+                                <p>Bank Name : </p>
+                                <p>SWIFT : </p>
+                                <p>Account Number : </p>
+                                <p>IBAN : </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-7">
+                        <div class="span7">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h4>Contact Details</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <p>
+                                        Email : <br><br>
+                                        Mobile : <br> <br>
+                                        Twitter :
+                                    </p>
+                                    <h4>Payment should be made by Bank Transfer</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row pull-right" style="margin: 1% 1% 0.1% 0%;">
+                    <p align="right">-----------------------------</p>
+                    <p align="right">Signature</p>
+                </div>
+            </div>
+            <div class="container" id="screenView">
+                <div class="row">
+                    <button class="btn btn-primary pull-right" style="margin: 1% 1% 0.1% 0%;"
+                            onclick="printDiv('pdf-content')">Print
+                    </button>
+                    <a href="">
+                        <button onclick="closeTab()" class="btn btn-warning pull-right" style="margin: 1% 1% 0.1% 0%;">
+                            Close
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <style type="text/css" media="print">
+            #screenView {
+                display: none;
+            }
+
+        </style>
+        <script type="text/javascript">
+
+            function printDiv(divName) {
+                window.print()
+            }
+
+            function closeTab() {
+                window.top.close()
+            }
+
+        </script>
+    </body>
+</html>

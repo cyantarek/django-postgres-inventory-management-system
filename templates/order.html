@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <br>
+                <div class="card" style="width: 120%">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-lg-10 col-md-10 col-sm-8 col-xs-6">
+                                <h3 class="card-title">Order List</h3>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6" align="right">
+                                <button data-toggle="modal" data-target="#orderModal" type="button" name="add"
+                                        id="add_button" class="btn btn-success btn-xs">Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table id="order_data" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer Name</th>
+                                    <th>Total Amount</th>
+                                    <th>Payment Status</th>
+                                    <th>Order Status</th>
+                                    <th>Change</th>
+                                    <th>Order Date</th>
+                                    <th>Complete Date</th>
+                                    {% if request.session.user_type == 'master' %}
+                                        <th>Created by</th>
+                                    {% endif %}
+                                    <th>Invoice</th>
+                                    <th>Edit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                    <tr>
+                                        <td>{{ order.0 }}</td>
+                                        <td>{{ order.4 }}</td>
+                                        <td>{{ order.2 }}</td>
+                                        <td>
+                                            {% if order.6 == 'cash' %}
+                                                <span class="badge badge-primary">Cash</span>
+                                            {% else %}
+                                                <span class="badge badge-warning">Credit</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if order.7 == 'active' %}
+                                                <span class="badge badge-danger">Pending</span>
+                                            {% else %}
+                                                <span class="badge badge-success">Completed</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="/order/status_change/{{ order.0 }}/">
+                                                <button type="button" name="delete" id=""
+                                                        class="btn btn-error btn-xs">Change
+                                                </button>
+                                            </a>
+                                        </td>
+                                        <td>{{ order.3 }}</td>
+                                        <td>{{ order.9 }}</td>
+                                        {% if request.session.user_type == 'master' %}
+                                            <td>{{ order.13 }}</td>
+                                        {% endif %}
+                                        <td><a target="_blank" href="/invoice/{{ order.0 }}/"
+                                               class="btn btn-info btn-xs">Invoice</a></td>
+                                        <td>
+                                            <button type="button" name="update" id=""
+                                                    class="btn btn-warning btn-xs" data-toggle="modal"
+                                                    data-target="#{{ category.category_id }}">Edit
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination" style="justify-content: center;">
+                            {% if orders.has_previous %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?page={{ orders.previous_page_number }}">Previous</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><a class="page-link"
+                                                                  href="">Previous</a></li>
+                            {% endif %}
+                            {% for i in orders.paginator.page_range %}
+                                {% if orders.number == i %}
+                                    <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if orders.has_next %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?page={{ orders.next_page_number }}">Next</a></li>
+                            {% else %}
+                                <li class="page-item disabled"><a class="page-link"
+                                                                  href="">Next</a></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <div id="orderModal" class="modal fade">
+            <div class="modal-dialog">
+                <form method="post" id="order_form" action="/order/add/">
+                    {% csrf_token %}
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title"><i class="fa fa-plus"></i> Create Order</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Enter Receiver Name</label>
+                                        <input type="text" name="inventory_order_name" id="inventory_order_name"
+                                               class="form-control" required/>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Date</label>
+                                        <input type="date" name="inventory_order_date" id="inventory_order_date"
+                                               class="form-control" required onclick="showDate()"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Enter Receiver Address</label>
+                                <textarea name="inventory_order_address" id="inventory_order_address"
+                                          class="form-control" required></textarea>
+                            </div>
+                            <div class="form-group" id="product_details">
+                                <label>Enter Product Details</label>
+                                <div class="row">
+                                    <div class="col-sm-1">
+                                        <button type="button" name="add_more" id="add_more"
+                                                class="btn btn-success btn-xs" onclick="addProductRow()">Add Product
+                                        </button>
+                                    </div>
+                                </div>
+                                <br>
+                                <div id="add_product">
+                                    <div class="row">
+                                        <div class="col-sm-7">
+                                            <select name="product_id" id="product_id"
+                                                    class="form-control selectpicker"
+                                                    required>
+                                                {% for product in products %}
+                                                    <option value="{{ product.0 }}">{{ product.1 }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            <input type="number" name="quantity" class="form-control" required
+                                                   value="1">
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <button type="button" name="remove"
+                                                    class="btn btn-danger btn-xs remove">-
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <br>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Select Payment Status</label>
+                                <select name="payment_status" id="payment_status" class="form-control">
+                                    <option value="cash">Cash</option>
+                                    <option value="credit">Credit</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Discount(%)</label>
+                                <input type="number" name="discount" class="form-control" required
+                                       value="0">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="submit" name="action" id="action" class="btn btn-info"
+                                   value="Add Order"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript">
+        var count = 1;
+
+        function addProductRow() {
+            $("#add_product").clone().appendTo("#product_details")
+            count += 1;
+        }
+
+        $(".remove").on("click", function (e) {
+            e.preventDefault()
+            count -= 1;
+            if (count > 1) {
+                $(this).parent().parent().remove();
+
+
+            }
+
+        })
+    </script>
+{% endblock %}
+
+<span id="productRow">
+    <div class="row">
+        <div class="col-md-8">
+            <select name="product_id" id="product_id" class="form-control selectpicker" required>
+
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" required>
+        </div>
+        <div class="col-md-1">
+            <button type="button" name="add_more" id="add_more" class="btn btn-success btn-xs">+</button>
+            <button type="button" name="remove" id="remove" class="btn btn-danger btn-xs">-</button>
+        </div>
+    </div>
+    <br>
+</span>

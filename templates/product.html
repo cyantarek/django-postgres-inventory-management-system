@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <span id="alert_action"></span>
+        <div class="row">
+            <div class="col-lg-12">
+                <br>
+                <div class="card card-default" style="width: 120%">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-lg-10 col-md-10 col-sm-8 col-xs-6">
+                                <h3 class="card-title">Product List</h3>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6" align="right">
+                                <button type="button" name="add" id="add_button" data-toggle="modal"
+                                        data-target="#productModal" class="btn btn-success btn-xs">Add
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="clear:both"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-12 table-responsive">
+                                <table id="user_data" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Product Name</th>
+                                            <th>Category</th>
+                                            <th>Brand</th>
+                                            <th>Quantity</th>
+                                            <th>Enter By</th>
+                                            <th>Status</th>
+                                            <th>Change</th>
+                                            <th>View</th>
+                                            <th>Edit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for product in products %}
+                                            <tr>
+                                                <td>{{ product.0 }}</td>
+                                                <td>{{ product.3 }}</td>
+                                                <td>{{ product.14 }}</td>
+                                                <td>{{ product.18 }}</td>
+                                                <td>{{ product.5 }}</td>
+                                                <td>{{ product.23 }}</td>
+                                                <td>
+                                                    {% if product.11 == 'active' %}
+                                                        <span class="badge badge-success">Available</span>
+                                                    {% else %}
+                                                        <span class="badge badge-danger">Out of Stock</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <a href="/product/status_change/{{ product.0 }}/">
+                                                        <button type="button" name="delete" id=""
+                                                                class="btn btn-error btn-xs">Change
+                                                        </button>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <button type="button" name="update" id=""
+                                                            class="btn btn-success btn-xs" data-toggle="modal"
+                                                            data-target="#{{ product.0 }}">View
+                                                    </button>
+                                                </td>
+                                                <td>
+                                                    <button type="button" name="update" id=""
+                                                            class="btn btn-warning btn-xs" data-toggle="modal"
+                                                            data-target="#{{ product.0 }}">Edit
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination" style="justify-content: center;">
+                                {% if products.has_previous %}
+                                    <li class="page-item"><a class="page-link"
+                                                             href="?page={{ products.previous_page_number }}">Previous</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled"><a class="page-link"
+                                                                      href="">Previous</a></li>
+                                {% endif %}
+                                {% for i in products.paginator.page_range %}
+                                    {% if products.number == i %}
+                                        <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                                    {% else %}
+                                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if products.has_next %}
+                                    <li class="page-item"><a class="page-link"
+                                                             href="?page={{ products.next_page_number }}">Next</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled"><a class="page-link"
+                                                                      href="">Next</a></li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {% for product in products %}
+        <div id="{{ product.0 }}" class="modal fade">
+            <div class="modal-dialog modal-lg">
+                <form method="post" id="user_form">
+                    {% csrf_token %}
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title"><i class="fa fa-plus"></i> Product Details</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+
+                            <div class="table-responsive">
+                                <table class="table table-boredered">
+                                    <tr>
+                                        <td width="20%">Product Name</td>
+                                        <td>{{ product.3 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Product Description</td>
+                                        <td>{{ product.4 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Category</td>
+                                        <td>{{ product.14 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Brand</td>
+                                        <td>{{ product.18 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Available Quantity</td>
+                                        <td>{{ product.5 }} {{ product.6 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Base Price</td>
+                                        <td>{{ product.7 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Tax (%)</td>
+                                        <td>{{ product.8 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Enter By</td>
+                                        <td>{{ product.23 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Status</td>
+                                        <td> {% if product.11 == 'active' %}
+                                            <span class="badge badge-success">Active</span>
+                                        {% else %}
+                                            <span class="badge badge-danger">Inactive</span>
+                                        {% endif %}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div id="productModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <form method="post" id="user_form" action="/product/add/">
+                {% csrf_token %}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title"><i class="fa fa-plus"></i> Add Product</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Enter Product Name</label>
+                            <input type="text" name="product_name" id="category_name" class="form-control" required/>
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select name="category_id" class="form-control" required>
+                                <option value="">Select Category</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.category_id }}">{{ category.category_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Brand</label>
+                            <select name="brand_id" class="form-control" required>
+                                <option value="">Select Brand</option>
+                                {% for brand in brands %}
+                                    <option value="{{ brand.brand_id }}">{{ brand.brand_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Enter Product Description</label>
+                            <textarea name="product_description" id="product_description" class="form-control"
+                                      rows="5" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Enter Product Quantity</label>
+                            <div class="input-group">
+                                <input type="text" name="product_quantity" id="product_quantity"
+                                       class="form-control" required pattern="[+-]?([0-9]*[.])?[0-9]+"/>
+                                <span class="input-group-addon">
+                                        <select name="product_unit" id="product_unit" required class="form-control">
+                                            <option value="">Select Unit</option>
+                                            <option value="Bags">Bags</option>
+                                            <option value="Bottles">Bottles</option>
+                                            <option value="Box">Box</option>
+                                            <option value="Dozens">Dozens</option>
+                                            <option value="Feet">Feet</option>
+                                            <option value="Gallon">Gallon</option>
+                                            <option value="Grams">Grams</option>
+                                            <option value="Inch">Inch</option>
+                                            <option value="Kg">Kg</option>
+                                            <option value="Liters">Liters</option>
+                                            <option value="Meter">Meter</option>
+                                            <option value="Nos">Nos</option>
+                                            <option value="Packet">Packet</option>
+                                            <option value="Rolls">Rolls</option>
+                                        </select>
+                                    </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Enter Product Base Price</label>
+                            <input type="text" name="product_base_price" id="product_base_price"
+                                   class="form-control" required pattern="[+-]?([0-9]*[.])?[0-9]+"/>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Enter Product Tax (%)</label>
+                            <input type="text" name="product_tax" id="product_tax" class="form-control" required
+                                   pattern="[+-]?([0-9]*[.])?[0-9]+"/>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <input type="submit" name="action" id="action" class="btn btn-info" value="Add"/>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

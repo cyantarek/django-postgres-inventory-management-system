@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div class="container">
+        <span id="alert_action"></span>
+        <div class="row">
+            <div class="col-lg-12">
+                <br>
+                <div class="card card-default" style="width: 120%">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-lg-10 col-md-10 col-sm-8 col-xs-6">
+                                <h3 class="card-title">User List</h3>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6" align="right">
+                                <button type="button" name="add" id="add_button" data-toggle="modal"
+                                        data-target="#userModal" class="btn btn-success btn-xs">Add
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="clear:both"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-12 table-responsive">
+                                <table id="user_data" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Email</th>
+                                            <th>Name</th>
+                                            <th>Status</th>
+                                            <th>Change</th>
+                                            <th>Edit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in users %}
+                                            <tr>
+                                                <td>{{ user.user_id }}</td>
+                                                <td>{{ user.user_email }}</td>
+                                                <td>{{ user.user_name }}</td>
+                                                <td>
+                                                    {% if user.user_status == 'Active' %}
+                                                        <span class="badge badge-success">Active</span>
+                                                    {% else %}
+                                                        <span class="badge badge-danger">Inactive</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <a href="/user/status_change/{{ user.user_id }}/">
+                                                        <button type="button" name="delete" id=""
+                                                                class="btn btn-error btn-xs">Change
+                                                        </button>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <button type="button" name="update" id=""
+                                                            class="btn btn-warning btn-xs" data-toggle="modal"
+                                                            data-target="#{{ user.user_id }}">Update
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination" style="justify-content: center;">
+                                {% if users.has_previous %}
+                                    <li class="page-item"><a class="page-link"
+                                                             href="?page={{ users.previous_page_number }}">Previous</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled"><a class="page-link"
+                                                                      href="">Previous</a></li>
+                                {% endif %}
+                                {% for i in users.paginator.page_range %}
+                                    {% if users.number == i %}
+                                        <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                                    {% else %}
+                                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if users.has_next %}
+                                    <li class="page-item"><a class="page-link"
+                                                             href="?page={{ users.next_page_number }}">Next</a></li>
+                                {% else %}
+                                    <li class="page-item disabled"><a class="page-link"
+                                                                      href="">Next</a></li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {% for user in users %}
+        <div id="{{ user.user_id }}" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <form method="post" id="user_form">
+                    {% csrf_token %}
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title"><i class="fa fa-plus"></i> Edit User</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Enter User Name</label>
+                                <input type="text" name="user_name" id="user_name" class="form-control" required
+                                       value="{{ user.user_name }}"/>
+                            </div>
+                            <div class="form-group">
+                                <label>Enter User Email</label>
+                                <input type="email" name="user_email" id="user_email" class="form-control" required
+                                       value="{{ user.user_email }}"/>
+                            </div>
+                            <div class="form-group">
+                                <label>Enter User Password</label>
+                                <input type="password" name="user_password" id="user_password" class="form-control"
+                                       required/>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="hidden" name="user_id" id="user_id"/>
+                            <input type="hidden" name="btn_action" id="btn_action"/>
+                            <input type="submit" name="action" id="action" class="btn btn-info" value="Update"/>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div id="userModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <form method="post" id="user_form" action="/user/add/">
+                {% csrf_token %}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title"><i class="fa fa-plus"></i> Add User</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Enter User Name</label>
+                            <input type="text" name="user_name" id="user_name" class="form-control" required/>
+                        </div>
+                        <div class="form-group">
+                            <label>Enter User Email</label>
+                            <input type="email" name="user_email" id="user_email" class="form-control" required/>
+                        </div>
+                        <div class="form-group">
+                            <label>Enter User Password</label>
+                            <input type="password" name="user_password" id="user_password" class="form-control"
+                                   required/>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="hidden" name="user_id" id="user_id"/>
+                        <input type="hidden" name="btn_action" id="btn_action"/>
+                        <input type="submit" name="action" id="action" class="btn btn-info" value="Add"/>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+    </script>
+{% endblock %}
